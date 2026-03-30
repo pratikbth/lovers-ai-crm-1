@@ -56,7 +56,7 @@ export default function Sidebar({ counts, currentPath, user, isAdmin, onLogout, 
     const navItems = useMemo(() => getNavItems(), []);
     
     return (
-        <div className={`w-60 bg-white border-r border-gray-100 h-screen flex flex-col ${className}`}>
+        <div className={`w-60 bg-white border-r border-gray-100 flex flex-col ${className}`} style={{ height: '100dvh' }}>
             {/* Header */}
             <div className="p-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
