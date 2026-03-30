@@ -102,11 +102,11 @@ def serialize_doc(doc: dict) -> dict:
     return result
 
 async def get_current_user(request: Request) -> dict:
-    token = request.cookies.get("access_token")
-    if not token:
-        auth_header = request.headers.get("Authorization", "")
-        if auth_header.startswith("Bearer "):
-            token = auth_header[7:]
+    # Only use Authorization header to prevent ghost cookie stuck login issues
+    token = None
+    auth_header = request.headers.get("Authorization", "")
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:]
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:
@@ -454,18 +454,21 @@ async def get_me(request: Request):
 
 @api_router.post("/auth/refresh")
 async def refresh_token(request: Request, response: Response):
-    # Try cookie first, then Authorization header, then request body
-    token = request.cookies.get("refresh_token")
+    token = None
+    
+    # Try request body first
+    try:
+        body = await request.json()
+        token = body.get("refresh_token")
+    except Exception:
+        pass
+        
+    # Then try Authorization header
     if not token:
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             token = auth_header[7:]
-    if not token:
-        try:
-            body = await request.json()
-            token = body.get("refresh_token")
-        except Exception:
-            pass
+            
     if not token:
         raise HTTPException(status_code=401, detail="No refresh token")
     
