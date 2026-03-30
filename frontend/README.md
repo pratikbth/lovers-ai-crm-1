@@ -65,6 +65,23 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/a
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
+## Vercel Deployment
+
+To deploy this app on Vercel:
+
+- Set the project root to `frontend`
+- Build command: `yarn build`
+- Output directory: `build`
+- `vercel.json` is configured for SPA routing to `index.html`
+
+If you use the Vercel CLI, run:
+
+```bash
+cd frontend
+yarn install
+npx vercel --prod
+```
+
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
