@@ -1,0 +1,138 @@
+{
+  "theme": "light",
+  "archetype": "Pastel & Soft + High Density Functional",
+  "domain": "Wedding CRM Dashboard",
+  "typography": {
+    "font_family_headings": "Poppins, sans-serif",
+    "font_family_body": "Inter, sans-serif",
+    "hierarchy": {
+      "h1": "text-2xl sm:text-3xl font-semibold tracking-tight",
+      "h2": "text-xl sm:text-2xl font-medium",
+      "h3": "text-lg font-medium",
+      "h4": "text-base font-medium",
+      "body": "text-[13px] sm:text-sm text-gray-600 leading-relaxed",
+      "small": "text-xs text-gray-500",
+      "table_data": "text-[12px] sm:text-[13px] leading-tight text-gray-700",
+      "table_header": "text-xs font-semibold uppercase tracking-wider text-gray-500",
+      "sidebar_link": "text-[13px] font-medium",
+      "stat_value": "text-2xl font-bold tracking-tight text-gray-900",
+      "stat_label": "text-[13px] font-medium text-gray-500"
+    },
+    "guidelines": "Use Poppins exclusively for headings, stat values, and key prominent text. Use Inter for all tabular data, descriptions, forms, and general body text. Prioritize maximum data density with text-xs (12px) to text-[13px] for tables."
+  },
+  "colors": {
+    "background": "#FFF5F5",
+    "surface": "#FFFFFF",
+    "primary": "#E8536A",
+    "primary_hover": "#D43D54",
+    "primary_light": "#FDE8EB",
+    "text_primary": "#1F2937",
+    "text_secondary": "#6B7280",
+    "text_tertiary": "#9CA3AF",
+    "border": "#F3F4F6",
+    "border_focus": "#E8536A",
+    "categories": {
+      "meeting_done": {"bg": "#D1FAE5", "text": "#065F46", "border": "#10B981"},
+      "interested": {"bg": "#DBEAFE", "text": "#1E40AF", "border": "#3B82F6"},
+      "call_back": {"bg": "#FEF3C7", "text": "#92400E", "border": "#F59E0B"},
+      "busy": {"bg": "#FEE2E2", "text": "#991B1B", "border": "#EF4444"},
+      "no_response": {"bg": "#F3F4F6", "text": "#374151", "border": "#9CA3AF"},
+      "foreign": {"bg": "#EDE9FE", "text": "#5B21B6", "border": "#8B5CF6"},
+      "future_projection": {"bg": "#CCFBF1", "text": "#115E59", "border": "#14B8A6"},
+      "needs_review": {"bg": "#FFEDD5", "text": "#9A3412", "border": "#F97316"},
+      "not_interested": {"bg": "#E5E7EB", "text": "#1F2937", "border": "#4B5563"}
+    }
+  },
+  "layout": {
+    "spacing": {
+      "page_padding": "p-4 sm:p-6 lg:p-8",
+      "card_padding": "p-4",
+      "card_padding_dense": "p-3",
+      "card_padding_reading": "p-6",
+      "table_cell_padding": "px-3 py-1.5",
+      "grid_gap": "gap-4 sm:gap-6",
+      "dense_grid_gap": "gap-3"
+    },
+    "radii": {
+      "card": "rounded-[16px]",
+      "button": "rounded-[12px]",
+      "input": "rounded-[10px]",
+      "badge": "rounded-full"
+    },
+    "shadows": {
+      "card": "shadow-[0_2px_12px_rgba(232,83,106,0.06)]",
+      "card_hover": "shadow-[0_8px_24px_rgba(232,83,106,0.12)]",
+      "dropdown": "shadow-[0_4px_20px_rgba(0,0,0,0.08)]"
+    },
+    "guidelines": "Compact table rows are CRITICAL. Aim for 20-25 rows visible on standard laptop screen. Dashboard stat cards should be small and dense to fit all on one screen. Limit card padding to 16px (p-4) on data-heavy pages. Sidebar text/icons slightly smaller. Mobile responsive with bottom nav bar."
+  },
+  "components": {
+    "card": {
+      "classes": "bg-white rounded-[16px] shadow-[0_2px_12px_rgba(232,83,106,0.06)] border border-gray-100",
+      "notes": "Use soft shadows and white background. Avoid heavy borders."
+    },
+    "button": {
+      "primary": "bg-[#E8536A] hover:bg-[#D43D54] text-white rounded-[12px] font-medium transition-colors focus:ring-2 focus:ring-[#E8536A]/20 focus:outline-none",
+      "secondary": "bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 rounded-[12px] font-medium transition-colors",
+      "ghost": "hover:bg-gray-100 text-gray-600 rounded-[12px] font-medium transition-colors"
+    },
+    "table": {
+      "container": "w-full overflow-auto rounded-[16px] border border-gray-100 bg-white",
+      "header_cell": "px-3 py-2 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider border-b border-gray-100 bg-gray-50/50",
+      "row": "border-b border-gray-50 hover:bg-[#FFF5F5]/40 transition-colors group",
+      "cell": "px-3 py-1.5 text-[13px] text-gray-700 whitespace-nowrap align-middle"
+    },
+    "input": {
+      "classes": "h-9 w-full rounded-[10px] border border-gray-200 bg-white px-3 py-1 text-[13px] text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#E8536A]/20 focus:border-[#E8536A] transition-all"
+    },
+    "sidebar": {
+      "container": "w-60 bg-white border-r border-gray-100 h-screen sticky top-0 flex flex-col hidden md:flex",
+      "link_active": "bg-[#FFF5F5] text-[#E8536A] font-medium rounded-[10px]",
+      "link_inactive": "text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-[10px] transition-colors",
+      "badge": "ml-auto bg-[#E8536A] text-white text-[10px] font-bold px-2 py-0.5 rounded-full min-w-[20px] text-center"
+    },
+    "bottom_nav": {
+      "container": "fixed bottom-0 w-full bg-white border-t border-gray-100 flex justify-around p-2 pb-safe z-50 md:hidden"
+    }
+  },
+  "motion": {
+    "hover": "transition-all duration-200 ease-in-out",
+    "page_transition": "animate-in fade-in slide-in-from-bottom-2 duration-300",
+    "dropdown": "animate-in zoom-in-95 duration-100 ease-out"
+  },
+  "media": {
+    "logos": {
+      "main": "https://images.pexels.com/photos/36254873/pexels-photo-36254873.jpeg",
+      "description": "Elegant minimal wedding ring aesthetic logo placeholder"
+    },
+    "avatars": [
+      "https://images.unsplash.com/photo-1651684215020-f7a5b6610f23?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwyfHxwcm9mZXNzaW9uYWwlMjBwcm9maWxlJTIwZmFjZXxlbnwwfHx8fDE3NzQ4NjQ2Nzh8MA&ixlib=rb-4.1.0&q=85",
+      "https://images.unsplash.com/photo-1758598305593-7c12d15687be?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzN8MHwxfHNlYXJjaHwzfHxwcm9mZXNzaW9uYWwlMjBwcm9maWxlJTIwZmFjZXxlbnwwfHx8fDE3NzQ4NjQ2Nzh8MA&ixlib=rb-4.1.0&q=85",
+      "https://images.pexels.com/photos/36623220/pexels-photo-36623220.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    ],
+    "empty_states": {
+      "calendar": "https://images.pexels.com/photos/8092469/pexels-photo-8092469.jpeg",
+      "description": "Minimal workspace for empty state backgrounds"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "size_default": 16,
+    "size_sidebar": 18
+  },
+  "accessibility": {
+    "required_attributes": ["data-testid"],
+    "notes": "Ensure all interactive elements have data-testid attributes. Maintain WCAG AA contrast ratio. Use hover:text-white on dark backgrounds if bg changes to dark on hover."
+  },
+  "instructions_to_main_agent": [
+    "Use Poppins for Headings and Inter for Body/Tables.",
+    "Data Density is CRITICAL: Ensure Lead tables have py-1.5, text-[13px], to fit 20-25 rows on screen.",
+    "Dashboard cards must be compact. p-4 padding instead of p-6.",
+    "Cards must have rounded-[16px] and the soft shadow specified in design guidelines.",
+    "Sidebar should feature live count badges in a compact coral pill.",
+    "Implement bottom navigation strictly for mobile viewports, hiding sidebar.",
+    "Lead Status/Category colors are defined in colors.categories, use them to build consistent badges across the app.",
+    "Background page color must be #FFF5F5, cards are pure #FFFFFF.",
+    "Add data-testid attributes to all actionable elements (buttons, links, table rows)."
+  ]
+}
