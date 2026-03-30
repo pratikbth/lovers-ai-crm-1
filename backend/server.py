@@ -32,6 +32,11 @@ JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
+# Production detection
+IS_PRODUCTION = os.environ.get("RAILWAY_ENVIRONMENT") or os.environ.get("RENDER") or os.environ.get("FLY_APP_NAME") or (os.environ.get("FRONTEND_URL", "").startswith("https"))
+COOKIE_SECURE = bool(IS_PRODUCTION)
+COOKIE_SAMESITE = "none" if IS_PRODUCTION else "lax"
+
 # Create the main app
 app = FastAPI(title="Wed Us CRM API")
 
@@ -425,11 +430,14 @@ async def login(credentials: UserLogin, response: Response):
     access_token = create_access_token(user_id, email, user["role"])
     refresh_token = create_refresh_token(user_id)
     
-    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=900, path="/")
-    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=False, samesite="lax", max_age=604800, path="/")
+    response.set_cookie(key="access_token", value=access_token, httponly=True, secure=COOKIE_SECURE, samesite=COOKIE_SAMESITE, max_age=900, path="/")
+    response.set_cookie(key="refresh_token", value=refresh_token, httponly=True, secure=COOKIE_SECURE, samesite=COOKIE_SAMESITE, max_age=604800, path="/")
     
     user_data = serialize_doc(user)
     user_data.pop("password_hash", None)
+    # Also return tokens in response body for cross-origin header-based auth
+    user_data["access_token"] = access_token
+    user_data["refresh_token"] = refresh_token
     return user_data
 
 @api_router.post("/auth/logout")
@@ -446,7 +454,18 @@ async def get_me(request: Request):
 
 @api_router.post("/auth/refresh")
 async def refresh_token(request: Request, response: Response):
+    # Try cookie first, then Authorization header, then request body
     token = request.cookies.get("refresh_token")
+    if not token:
+        auth_header = request.headers.get("Authorization", "")
+        if auth_header.startswith("Bearer "):
+            token = auth_header[7:]
+    if not token:
+        try:
+            body = await request.json()
+            token = body.get("refresh_token")
+        except Exception:
+            pass
     if not token:
         raise HTTPException(status_code=401, detail="No refresh token")
     
@@ -462,9 +481,9 @@ async def refresh_token(request: Request, response: Response):
         user_id = str(user["_id"])
         access_token = create_access_token(user_id, user["email"], user["role"])
         
-        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=False, samesite="lax", max_age=900, path="/")
+        response.set_cookie(key="access_token", value=access_token, httponly=True, secure=COOKIE_SECURE, samesite=COOKIE_SAMESITE, max_age=900, path="/")
         
-        return {"message": "Token refreshed"}
+        return {"message": "Token refreshed", "access_token": access_token}
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Refresh token expired")
     except jwt.InvalidTokenError:

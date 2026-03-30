@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
     GripVertical, Plus, Edit2, Trash2, Phone, MapPin, Calendar,
     ChevronDown, ArrowUpDown, User, Clock, Briefcase, Check
@@ -369,8 +369,8 @@ export default function Pipeline() {
         const fetchData = async () => {
             try {
                 const [leadsRes, teamRes] = await Promise.all([
-                    axios.get(`${API_URL}/api/leads?limit=500`, { withCredentials: true }),
-                    axios.get(`${API_URL}/api/team`, { withCredentials: true })
+                    api.get(`/api/leads?limit=500`),
+                    api.get(`/api/team`)
                 ]);
                 setLeads(leadsRes.data.leads || []);
                 setTeamMembers(teamRes.data);
@@ -438,9 +438,9 @@ export default function Pipeline() {
 
         // Update in backend
         try {
-            await axios.patch(`${API_URL}/api/leads/${leadId}`, {
+            await api.patch(`/api/leads/${leadId}`, {
                 pipelineStage: newStage
-            }, { withCredentials: true });
+            });
         } catch (err) {
             console.error('Error updating pipeline stage:', err);
             // Revert on error
@@ -470,7 +470,7 @@ export default function Pipeline() {
         if (!window.confirm(`Delete "${lead.companyName}"?`)) return;
         
         try {
-            await axios.delete(`${API_URL}/api/leads/${lead.id}`, { withCredentials: true });
+            await api.delete(`/api/leads/${lead.id}`);
             setLeads(prev => prev.filter(l => l.id !== lead.id));
         } catch (err) {
             console.error('Error deleting lead:', err);
@@ -481,7 +481,7 @@ export default function Pipeline() {
         setAddLeadModalOpen(false);
         // Refresh leads
         try {
-            const res = await axios.get(`${API_URL}/api/leads?limit=500`, { withCredentials: true });
+            const res = await api.get(`/api/leads?limit=500`);
             setLeads(res.data.leads || []);
         } catch (err) {
             console.error('Error refreshing leads:', err);
@@ -630,7 +630,7 @@ function AddLeadModalWithStage({ open, onClose, onSuccess, teamMembers, defaultS
         setError('');
 
         try {
-            await axios.post(`${API_URL}/api/leads`, formData, { withCredentials: true });
+            await api.post(`/api/leads`, formData);
             onSuccess();
             setFormData({
                 companyName: '',

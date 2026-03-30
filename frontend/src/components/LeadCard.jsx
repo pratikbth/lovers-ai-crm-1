@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
     Phone, MapPin, MessageCircle, Instagram, Calendar, Clock, 
     Check, ChevronDown, ChevronUp, Send, Undo2
@@ -74,14 +74,14 @@ export default function LeadCard({ lead, teamMembers, onUpdate, showRevive = fal
             }
 
             // Log response
-            await axios.post(`${API_URL}/api/leads/${lead.id}/response`, {
+            await api.post(`/api/leads/${lead.id}/response`, {
                 response,
                 notes,
                 nextFollowupDate: followupDateTime,
                 portfolioSent,
                 priceListSent,
                 waSent
-            }, { withCredentials: true });
+            });
 
             // Update pipeline stage and category if changed
             const updates = {};
@@ -89,7 +89,7 @@ export default function LeadCard({ lead, teamMembers, onUpdate, showRevive = fal
             if (newCategory) updates.category = newCategory;
             
             if (Object.keys(updates).length > 0) {
-                await axios.patch(`${API_URL}/api/leads/${lead.id}`, updates, { withCredentials: true });
+                await api.patch(`/api/leads/${lead.id}`, updates);
             }
 
             // Reset form
@@ -114,9 +114,9 @@ export default function LeadCard({ lead, teamMembers, onUpdate, showRevive = fal
 
     const handleRevive = async () => {
         try {
-            await axios.patch(`${API_URL}/api/leads/${lead.id}`, {
+            await api.patch(`/api/leads/${lead.id}`, {
                 category: 'Needs Review'
-            }, { withCredentials: true });
+            });
             onUpdate?.();
         } catch (err) {
             console.error('Error reviving lead:', err);

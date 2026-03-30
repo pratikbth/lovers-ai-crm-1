@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { Calendar, CalendarRange } from 'lucide-react';
 import LeadCard from '../components/LeadCard';
 
@@ -21,8 +21,8 @@ export default function ThisWeek() {
             weekEnd.setHours(23, 59, 59, 999);
 
             const [leadsRes, teamRes] = await Promise.all([
-                axios.get(`${API_URL}/api/leads?limit=500`, { withCredentials: true }),
-                axios.get(`${API_URL}/api/team`, { withCredentials: true })
+                api.get(`/api/leads?limit=500`),
+                api.get(`/api/team`)
             ]);
 
             // Filter leads with nextFollowupDate in next 7 days

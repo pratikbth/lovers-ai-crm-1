@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useOutletContext, useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
     Search, Filter, ChevronDown, ChevronUp, Phone, Mail, MapPin, 
     Download, Upload, Plus, Trash2, Users, X, Check, Edit2,
@@ -132,9 +132,9 @@ export default function AllLeads() {
         const fetchFilters = async () => {
             try {
                 const [teamRes, citiesRes, sourcesRes] = await Promise.all([
-                    axios.get(`${API_URL}/api/team`, { withCredentials: true }),
-                    axios.get(`${API_URL}/api/leads/cities`, { withCredentials: true }),
-                    axios.get(`${API_URL}/api/leads/sources`, { withCredentials: true })
+                    api.get(`/api/team`),
+                    api.get(`/api/leads/cities`),
+                    api.get(`/api/leads/sources`)
                 ]);
                 setTeamMembers(teamRes.data);
                 setCities(citiesRes.data);
@@ -168,7 +168,7 @@ export default function AllLeads() {
             params.append('limit', pageSize);
             params.append('skip', page * pageSize);
 
-            const response = await axios.get(`${API_URL}/api/leads?${params.toString()}`, {
+            const response = await api.get(`/api/leads?${params.toString()}`, {
                 withCredentials: true
             });
             setLeads(response.data.leads);
@@ -240,10 +240,10 @@ export default function AllLeads() {
     const handleBulkDelete = async () => {
         if (!window.confirm(`Delete ${selectedIds.size} leads?`)) return;
         try {
-            await axios.post(`${API_URL}/api/leads/bulk`, {
+            await api.post(`/api/leads/bulk`, {
                 leadIds: Array.from(selectedIds),
                 action: 'delete'
-            }, { withCredentials: true });
+            });
             setSelectedIds(new Set());
             fetchLeads();
         } catch (err) {
@@ -253,11 +253,11 @@ export default function AllLeads() {
 
     const handleBulkReassign = async (userId) => {
         try {
-            await axios.post(`${API_URL}/api/leads/bulk`, {
+            await api.post(`/api/leads/bulk`, {
                 leadIds: Array.from(selectedIds),
                 action: 'reassign',
                 value: userId
-            }, { withCredentials: true });
+            });
             setSelectedIds(new Set());
             fetchLeads();
         } catch (err) {
@@ -274,9 +274,9 @@ export default function AllLeads() {
     const saveEdit = async () => {
         if (!editingCell) return;
         try {
-            await axios.patch(`${API_URL}/api/leads/${editingCell.leadId}`, {
+            await api.patch(`/api/leads/${editingCell.leadId}`, {
                 [editingCell.field]: editValue
-            }, { withCredentials: true });
+            });
             fetchLeads();
         } catch (err) {
             console.error('Edit error:', err);
@@ -298,7 +298,7 @@ export default function AllLeads() {
         if (cityFilter) params.append('city', cityFilter);
         if (search) params.append('search', search);
         
-        window.open(`${API_URL}/api/leads/export?${params.toString()}`, '_blank');
+        window.open(`/api/leads/export?${params.toString()}`, '_blank');
     };
 
     // Clear filters

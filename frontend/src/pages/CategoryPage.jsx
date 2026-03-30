@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { Search, Download, Plus, Filter } from 'lucide-react';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
@@ -182,8 +182,8 @@ export default function CategoryPage({ category }) {
             if (search) params.append('search', search);
 
             const [leadsRes, teamRes] = await Promise.all([
-                axios.get(`${API_URL}/api/leads?${params.toString()}`, { withCredentials: true }),
-                axios.get(`${API_URL}/api/team`, { withCredentials: true })
+                api.get(`/api/leads?${params.toString()}`),
+                api.get(`/api/team`)
             ]);
 
             setLeads(leadsRes.data.leads || []);
@@ -205,7 +205,7 @@ export default function CategoryPage({ category }) {
         params.append('category', category);
         if (assignedToFilter) params.append('assignedTo', assignedToFilter);
         if (search) params.append('search', search);
-        window.open(`${API_URL}/api/leads/export?${params.toString()}`, '_blank');
+        window.open(`/api/leads/export?${params.toString()}`, '_blank');
     };
 
     const sortedLeads = sortLeads(leads, sortKey, teamMembers);

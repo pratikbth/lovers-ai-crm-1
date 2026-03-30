@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import BottomNav from './BottomNav';
 import { useAuth } from '../contexts/AuthContext';
-import axios from 'axios';
+import api from '../lib/api';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -17,7 +17,7 @@ export default function Layout() {
     useEffect(() => {
         const fetchCounts = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/leads/count`, {
+                const response = await api.get(`/api/leads/count`, {
                     withCredentials: true
                 });
                 setCounts(response.data);

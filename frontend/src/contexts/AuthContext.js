@@ -3,6 +3,21 @@ import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
+// Create an axios instance with auth interceptor
+const api = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+});
+
+// Add Authorization header from localStorage to every request
+api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('access_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+});
+
 const AuthContext = createContext(null);
 
 export const useAuth = () => {
@@ -12,6 +27,9 @@ export const useAuth = () => {
     }
     return context;
 };
+
+// Export the axios instance for use across the app
+export { api };
 
 function formatApiErrorDetail(detail) {
     if (detail == null) return "Something went wrong. Please try again.";
@@ -29,20 +47,27 @@ export const AuthProvider = ({ children }) => {
 
     const checkAuth = useCallback(async () => {
         try {
-            const response = await axios.get(`${API_URL}/api/auth/me`, {
-                withCredentials: true
-            });
+            const response = await api.get('/api/auth/me');
             setUser(response.data);
             return true;
         } catch (err) {
             // Try to refresh token
             if (err.response?.status === 401) {
                 try {
-                    await axios.post(`${API_URL}/api/auth/refresh`, {}, { withCredentials: true });
-                    const response = await axios.get(`${API_URL}/api/auth/me`, { withCredentials: true });
+                    const refreshToken = localStorage.getItem('refresh_token');
+                    const refreshRes = await api.post('/api/auth/refresh', {
+                        refresh_token: refreshToken
+                    });
+                    // Store the new access token
+                    if (refreshRes.data?.access_token) {
+                        localStorage.setItem('access_token', refreshRes.data.access_token);
+                    }
+                    const response = await api.get('/api/auth/me');
                     setUser(response.data);
                     return true;
                 } catch (refreshErr) {
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('refresh_token');
                     setUser(null);
                     return false;
                 }
@@ -60,7 +85,13 @@ export const AuthProvider = ({ children }) => {
         const refreshInterval = setInterval(async () => {
             if (user) {
                 try {
-                    await axios.post(`${API_URL}/api/auth/refresh`, {}, { withCredentials: true });
+                    const refreshToken = localStorage.getItem('refresh_token');
+                    const res = await api.post('/api/auth/refresh', {
+                        refresh_token: refreshToken
+                    });
+                    if (res.data?.access_token) {
+                        localStorage.setItem('access_token', res.data.access_token);
+                    }
                 } catch (err) {
                     // If refresh fails, check auth state
                     checkAuth();
@@ -74,12 +105,21 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             setError(null);
-            const response = await axios.post(
-                `${API_URL}/api/auth/login`,
-                { email, password },
-                { withCredentials: true }
-            );
-            setUser(response.data);
+            const response = await api.post('/api/auth/login', { email, password });
+            
+            // Store tokens from response body
+            if (response.data?.access_token) {
+                localStorage.setItem('access_token', response.data.access_token);
+            }
+            if (response.data?.refresh_token) {
+                localStorage.setItem('refresh_token', response.data.refresh_token);
+            }
+            
+            // Remove tokens from user data before storing
+            const userData = { ...response.data };
+            delete userData.access_token;
+            delete userData.refresh_token;
+            setUser(userData);
             return { success: true };
         } catch (err) {
             const errorMsg = formatApiErrorDetail(err.response?.data?.detail);
@@ -90,20 +130,30 @@ export const AuthProvider = ({ children }) => {
 
     const logout = async () => {
         try {
-            await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
+            await api.post('/api/auth/logout', {});
         } catch (err) {
             console.error('Logout error:', err);
         } finally {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             setUser(null);
         }
     };
 
     const refreshToken = async () => {
         try {
-            await axios.post(`${API_URL}/api/auth/refresh`, {}, { withCredentials: true });
+            const storedRefreshToken = localStorage.getItem('refresh_token');
+            const res = await api.post('/api/auth/refresh', {
+                refresh_token: storedRefreshToken
+            });
+            if (res.data?.access_token) {
+                localStorage.setItem('access_token', res.data.access_token);
+            }
             await checkAuth();
             return true;
         } catch (err) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
             setUser(null);
             return false;
         }

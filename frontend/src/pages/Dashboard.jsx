@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext, Link } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
     Users, Calendar, CalendarDays, CheckCircle, GitBranch,
     TrendingUp, PhoneCall, Clock, MessageCircle, Instagram,
@@ -50,7 +50,7 @@ export default function Dashboard() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/stats/dashboard`, {
+                const response = await api.get(`/api/stats/dashboard`, {
                     withCredentials: true
                 });
                 setStats(response.data);

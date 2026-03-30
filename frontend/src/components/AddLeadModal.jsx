@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Plus, X } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -84,7 +84,7 @@ export default function AddLeadModal({ open, onClose, onSuccess, teamMembers, de
         setError('');
 
         try {
-            await axios.post(`${API_URL}/api/leads`, formData, { withCredentials: true });
+            await api.post(`/api/leads`, formData);
             onSuccess();
             // Reset form
             setFormData({

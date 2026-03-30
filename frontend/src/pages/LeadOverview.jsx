@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { 
     ArrowLeft, Phone, Mail, MapPin, Instagram, MessageCircle, 
     Calendar, Clock, Edit2, Trash2, Check, X, ExternalLink,
@@ -98,7 +98,7 @@ export default function LeadOverview() {
 
     const fetchLead = useCallback(async () => {
         try {
-            const res = await axios.get(`${API_URL}/api/leads/${id}`, { withCredentials: true });
+            const res = await api.get(`/api/leads/${id}`);
             setLead(res.data);
         } catch (err) {
             console.error('Error fetching lead:', err);
@@ -117,7 +117,7 @@ export default function LeadOverview() {
     useEffect(() => {
         const fetchTeam = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/team`, { withCredentials: true });
+                const res = await api.get(`/api/team`);
                 setTeamMembers(res.data);
             } catch (err) {
                 console.error('Error fetching team:', err);
@@ -129,7 +129,7 @@ export default function LeadOverview() {
     const handleInlineEdit = async (field, value) => {
         setSaving(true);
         try {
-            await axios.patch(`${API_URL}/api/leads/${id}`, { [field]: value }, { withCredentials: true });
+            await api.patch(`/api/leads/${id}`, { [field]: value });
             await fetchLead();
             setEditingField(null);
         } catch (err) {
@@ -141,7 +141,7 @@ export default function LeadOverview() {
 
     const handleDelete = async () => {
         try {
-            await axios.delete(`${API_URL}/api/leads/${id}`, { withCredentials: true });
+            await api.delete(`/api/leads/${id}`);
             navigate('/leads');
         } catch (err) {
             console.error('Delete error:', err);
@@ -647,7 +647,7 @@ function EditLeadModal({ open, onClose, lead, onSuccess, teamMembers }) {
         setError('');
 
         try {
-            await axios.put(`${API_URL}/api/leads/${lead.id}`, formData, { withCredentials: true });
+            await api.put(`/api/leads/${lead.id}`, formData);
             onSuccess();
         } catch (err) {
             setError(err.response?.data?.detail || 'Failed to update lead');

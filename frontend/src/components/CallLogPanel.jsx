@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { X, Phone, Clock, User, Calendar, MessageSquare, Check, Send } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -61,7 +61,7 @@ export default function CallLogPanel({ lead, onClose, onUpdate, teamMembers }) {
     useEffect(() => {
         const fetchFullLead = async () => {
             try {
-                const res = await axios.get(`${API_URL}/api/leads/${lead.id}`, { withCredentials: true });
+                const res = await api.get(`/api/leads/${lead.id}`);
                 setFullLead(res.data);
             } catch (err) {
                 console.error('Error fetching lead:', err);
@@ -83,7 +83,7 @@ export default function CallLogPanel({ lead, onClose, onUpdate, teamMembers }) {
                     : `${nextFollowupDate}T10:00:00`;
             }
 
-            await axios.post(`${API_URL}/api/leads/${lead.id}/response`, {
+            await api.post(`/api/leads/${lead.id}/response`, {
                 response,
                 notes,
                 duration: duration ? parseInt(duration) : null,
@@ -92,7 +92,7 @@ export default function CallLogPanel({ lead, onClose, onUpdate, teamMembers }) {
                 priceListSent,
                 waSent,
                 waNumberUsed
-            }, { withCredentials: true });
+            });
 
             // Reset form
             setResponse('');
@@ -106,7 +106,7 @@ export default function CallLogPanel({ lead, onClose, onUpdate, teamMembers }) {
             setShowLogForm(false);
             
             // Refresh data
-            const res = await axios.get(`${API_URL}/api/leads/${lead.id}`, { withCredentials: true });
+            const res = await api.get(`/api/leads/${lead.id}`);
             setFullLead(res.data);
             onUpdate();
         } catch (err) {

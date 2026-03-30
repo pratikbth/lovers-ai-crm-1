@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import axios from 'axios';
+import api from '../lib/api';
 import { Users, Plus, Trash2, Mail, Shield, User } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -29,7 +29,7 @@ export default function Team() {
 
     const fetchTeam = async () => {
         try {
-            const response = await axios.get(`${API_URL}/api/team`, {
+            const response = await api.get(`/api/team`, {
                 withCredentials: true
             });
             setMembers(response.data);
@@ -45,7 +45,7 @@ export default function Team() {
         setError('');
         
         try {
-            await axios.post(`${API_URL}/api/team`, newMember, {
+            await api.post(`/api/team`, newMember, {
                 withCredentials: true
             });
             setNewMember({ name: '', email: '', password: '' });
@@ -60,7 +60,7 @@ export default function Team() {
         if (!window.confirm('Are you sure you want to remove this team member?')) return;
         
         try {
-            await axios.delete(`${API_URL}/api/team/${id}`, {
+            await api.delete(`/api/team/${id}`, {
                 withCredentials: true
             });
             fetchTeam();

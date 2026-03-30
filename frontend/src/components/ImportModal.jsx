@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import axios from 'axios';
+import api from '../lib/api';
 import { Upload, FileSpreadsheet, X, Check, AlertTriangle, ChevronRight, ArrowLeftRight, Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Progress } from './ui/progress';
@@ -109,7 +109,7 @@ export default function ImportModal({ open, onClose, onSuccess }) {
         try {
             const formData = new FormData();
             formData.append('file', selectedFile);
-            const res = await axios.post(`${API_URL}/api/leads/import/preview`, formData, {
+            const res = await api.post(`/api/leads/import/preview`, formData, {
                 withCredentials: true,
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
@@ -129,7 +129,7 @@ export default function ImportModal({ open, onClose, onSuccess }) {
         try {
             const formData = new FormData();
             formData.append('file', file);
-            const res = await axios.post(`${API_URL}/api/leads/import/analyze`, formData, {
+            const res = await api.post(`/api/leads/import/analyze`, formData, {
                 withCredentials: true,
                 headers: { 'Content-Type': 'multipart/form-data' }
             });
@@ -140,9 +140,9 @@ export default function ImportModal({ open, onClose, onSuccess }) {
             if (dups.length === 0) {
                 // No duplicates — import all directly
                 setBgImporting(true);
-                const batchRes = await axios.post(`${API_URL}/api/leads/import/batch`, {
+                const batchRes = await api.post(`/api/leads/import/batch`, {
                     leads: nonDuplicates.map(nd => nd.data)
-                }, { withCredentials: true });
+                });
 
                 setFinalResult({
                     imported: batchRes.data.imported,
@@ -164,9 +164,9 @@ export default function ImportModal({ open, onClose, onSuccess }) {
                 if (nonDuplicates.length > 0) {
                     setBgImporting(true);
                     try {
-                        const batchRes = await axios.post(`${API_URL}/api/leads/import/batch`, {
+                        const batchRes = await api.post(`/api/leads/import/batch`, {
                             leads: nonDuplicates.map(nd => nd.data)
-                        }, { withCredentials: true });
+                        });
                         setBgImported(batchRes.data.imported);
                     } catch (e) {
                         console.error('Background import error:', e);
@@ -210,9 +210,9 @@ export default function ImportModal({ open, onClose, onSuccess }) {
                 existingId: dup.existing.id,
             }));
 
-            const res = await axios.post(`${API_URL}/api/leads/import/resolve`, {
+            const res = await api.post(`/api/leads/import/resolve`, {
                 resolutions
-            }, { withCredentials: true });
+            });
 
             setFinalResult({
                 imported: bgImported,
