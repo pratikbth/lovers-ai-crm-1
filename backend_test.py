@@ -262,6 +262,95 @@ class WedUsCRMTester:
         except Exception as e:
             self.log_test("Add Response to Lead", False, str(e))
             return False, None
+
+    def test_pipeline_stage_update(self, lead_id):
+        """Test updating pipeline stage via PATCH (drag and drop simulation)"""
+        try:
+            # Test updating to different pipeline stages
+            test_stages = ["Interested", "Send Portfolio", "Meeting Scheduled"]
+            
+            for stage in test_stages:
+                update_data = {"pipelineStage": stage}
+                response = self.session.patch(f"{self.base_url}/api/leads/{lead_id}", json=update_data, timeout=10)
+                
+                if response.status_code == 200:
+                    lead_data = response.json()
+                    success = lead_data.get("pipelineStage") == stage
+                    if success:
+                        self.log_test(f"Pipeline Stage Update to {stage}", True, f"Updated to {stage}")
+                    else:
+                        self.log_test(f"Pipeline Stage Update to {stage}", False, f"Expected {stage}, got {lead_data.get('pipelineStage')}")
+                        return False
+                else:
+                    self.log_test(f"Pipeline Stage Update to {stage}", False, f"Status: {response.status_code}")
+                    return False
+            
+            return True
+        except Exception as e:
+            self.log_test("Pipeline Stage Update", False, str(e))
+            return False
+
+    def test_leads_by_pipeline_stage(self):
+        """Test filtering leads by pipeline stage"""
+        try:
+            # Test filtering by different pipeline stages
+            test_stages = ["New Contact", "Interested", "Send Portfolio"]
+            
+            for stage in test_stages:
+                response = self.session.get(f"{self.base_url}/api/leads?pipelineStage={stage}", timeout=10)
+                
+                if response.status_code == 200:
+                    leads_data = response.json()
+                    leads = leads_data.get("leads", [])
+                    # Check that all returned leads have the correct pipeline stage
+                    success = all(lead.get("pipelineStage") == stage for lead in leads)
+                    details = f"Found {len(leads)} leads in {stage}" if success else f"Some leads have wrong pipeline stage"
+                    self.log_test(f"Filter Leads by Pipeline Stage ({stage})", success, details)
+                    if not success:
+                        return False
+                else:
+                    self.log_test(f"Filter Leads by Pipeline Stage ({stage})", False, f"Status: {response.status_code}")
+                    return False
+            
+            return True
+        except Exception as e:
+            self.log_test("Filter Leads by Pipeline Stage", False, str(e))
+            return False
+
+    def test_create_lead_with_pipeline_stage(self):
+        """Test creating leads with specific pipeline stages"""
+        try:
+            test_stages = ["New Contact", "Interested", "Unknown", "Call Again 1"]
+            created_leads = []
+            
+            for stage in test_stages:
+                new_lead = {
+                    "companyName": f"Pipeline Test {stage} {datetime.now().strftime('%H%M%S')}",
+                    "phone": "9876543210",
+                    "city": "Delhi",
+                    "pipelineStage": stage,
+                    "category": "Needs Review",
+                    "priority": "Medium"
+                }
+                response = self.session.post(f"{self.base_url}/api/leads", json=new_lead, timeout=10)
+                
+                if response.status_code == 200:
+                    lead_data = response.json()
+                    success = lead_data.get("pipelineStage") == stage
+                    if success:
+                        created_leads.append(lead_data.get("id"))
+                        self.log_test(f"Create Lead in {stage}", True, f"Created lead in {stage}")
+                    else:
+                        self.log_test(f"Create Lead in {stage}", False, f"Expected {stage}, got {lead_data.get('pipelineStage')}")
+                        return False, []
+                else:
+                    self.log_test(f"Create Lead in {stage}", False, f"Status: {response.status_code}")
+                    return False, []
+            
+            return True, created_leads
+        except Exception as e:
+            self.log_test("Create Lead with Pipeline Stage", False, str(e))
+            return False, []
         """Test logout functionality"""
         try:
             response = self.session.post(f"{self.base_url}/api/auth/logout", timeout=10)
@@ -303,6 +392,12 @@ class WedUsCRMTester:
             lead_id = new_lead.get("id")
             self.test_get_single_lead(lead_id)
             self.test_add_response_to_lead(lead_id)
+            # Test Pipeline-specific functionality
+            self.test_pipeline_stage_update(lead_id)
+        
+        # Test Pipeline-specific endpoints
+        self.test_leads_by_pipeline_stage()
+        pipeline_create_success, pipeline_leads = self.test_create_lead_with_pipeline_stage()
         
         # Test team member login (new session)
         team_session = requests.Session()
