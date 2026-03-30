@@ -1792,10 +1792,13 @@ async def health_check():
 app.include_router(api_router)
 
 # CORS — allow frontend origin from env
-_frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
-_allowed_origins = [_frontend_url]
-if "http://localhost:3000" not in _allowed_origins:
-    _allowed_origins.append("http://localhost:3000")
+_frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000").rstrip("/")
+_allowed_origins = [
+    _frontend_url,
+    "http://localhost:3000",
+    "https://lovers-ai-crm-pratik.vercel.app"
+]
+_allowed_origins = list(set(_allowed_origins))
 
 app.add_middleware(
     CORSMiddleware,
